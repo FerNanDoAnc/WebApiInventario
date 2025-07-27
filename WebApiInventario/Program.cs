@@ -24,6 +24,13 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<CategoryService>();
 builder.Services.AddScoped<ProductService>();
 
+
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.PropertyNamingPolicy = null;
+    });
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -32,11 +39,14 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
 }
 
+
 // Middleware
 app.UseSwagger();
 app.UseSwaggerUI();
 
 app.UseHttpsRedirection();
+
+app.UseCors("AllowAll");
 
 app.UseAuthorization();
 
