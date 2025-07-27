@@ -15,14 +15,14 @@ public class CategoriesController : ControllerBase
         _service = service;
     }
 
-    [HttpGet]
-    public ActionResult<List<Category>> GetAll()
+    [HttpGet("GetAllCategory")]
+    public ActionResult<List<Category>> GetAllCategory()
     {
         return _service.GetAll();
     }
 
-    [HttpGet("{id}")]
-    public ActionResult<Category> Get(int id)
+    [HttpGet("GetCategory/{id}")]
+    public ActionResult<Category> GetCategory(int id)
     {
         var category = _service.GetById(id);
         if (category == null)
@@ -30,36 +30,44 @@ public class CategoriesController : ControllerBase
         return Ok(category);
     }
 
-    [HttpPost]
-    public IActionResult Post([FromBody] Category category)
+    [HttpPost("InsertCategory")]
+    public IActionResult InsertCategory([FromBody] Category category)
     {
         if (category == null || string.IsNullOrWhiteSpace(category.Name))
             return BadRequest("Invalid category data.");
         _service.Insert(category);
-        return CreatedAtAction(nameof(Get), new { id = category.Id }, category);
+        return CreatedAtAction(nameof(GetCategory), new { id = category.Id }, category);
     }
 
-    [HttpPut("{id}")]
-    public IActionResult Put(int id, [FromBody] Category category)
+    [HttpPut("UpdateCategory/{id}")]
+    public IActionResult UpdateCategory(int id, [FromBody] Category category)
     {
         if (id != category.Id)
-            return BadRequest("Category ID mismatch.");
-        
+        {
+            return BadRequest(new { exito = false, mensaje = "El ID proporcionado no coincide con la Categoría." });
+        }
+
         var existing = _service.GetById(id);
         if (existing == null)
-            return NotFound();
+        {
+            return NotFound(new { exito = false, mensaje = "Categoría no encontrada." });
+        }
+
         _service.Update(category);
-        return NoContent();
+        return Ok(new { exito = true, mensaje = "Categoría actualizada correctamente." });
     }
 
-    [HttpDelete("{id}")]
-    public IActionResult Delete(int id)
+    [HttpDelete("DeleteCategory/{id}")]
+    public IActionResult DeleteCategory(int id)
     {
         var existing = _service.GetById(id);
         if (existing == null)
-            return NotFound();
+        {
+            return NotFound(new { exito = false, mensaje = "Categoría no encontrada." });
+        }
+
         _service.Delete(id);
-        return NoContent();
+        return Ok(new { exito = true, mensaje = "Categoría eliminada correctamente." });
     }
 
 }

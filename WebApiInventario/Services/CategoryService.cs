@@ -75,9 +75,12 @@ public class CategoryService
     public void Delete(int id)
     {
         using var conn = new MySqlConnection(_config.GetConnectionString("MySqlConnection"));
-        using var cmd = new MySqlCommand("DeleteCategory", conn);
-        cmd.CommandType = CommandType.StoredProcedure;
+        using var cmd = new MySqlCommand("DeleteCategory", conn)
+        {
+            CommandType = CommandType.StoredProcedure
+        };
         cmd.Parameters.AddWithValue("@cId", id);
+
         conn.Open();
         cmd.ExecuteNonQuery();
     }

@@ -15,14 +15,14 @@ public class ProductsController : ControllerBase
         _service = service;
     }
 
-    [HttpGet]
-    public ActionResult<List<Product>> GetAll()
+    [HttpGet("GetAllProducts")]
+    public ActionResult<List<Product>> GetAllProducts()
     {
         return Ok(_service.GetAll());
     }
 
-    [HttpGet("{id}")]
-    public ActionResult<Product> Get(int id)
+    [HttpGet("GetProduct/{id}")]
+    public ActionResult<Product> GetProduct(int id)
     {
         var product = _service.GetById(id);
         if (product == null)
@@ -30,35 +30,41 @@ public class ProductsController : ControllerBase
         return Ok(product);
     }
 
-    [HttpPost]
-    public IActionResult Post([FromBody] Product p)
+    [HttpPost("InsertProduct")]
+    public IActionResult InsertProduct([FromBody] Product p)
     {
         _service.Insert(p);
-        return CreatedAtAction(nameof(Get), new { id = p.Id }, p);
+        return CreatedAtAction(nameof(GetProduct), new { id = p.Id }, p);
     }
 
-    [HttpPut("{id}")]
-    public IActionResult Put(int id, [FromBody] Product p)
+    [HttpPut("UpdateProduct/{id}")]
+    public IActionResult UpdateProduct(int id, [FromBody] Product p)
     {
         if (id != p.Id)
-            return BadRequest();
+        {
+            return BadRequest(new { exito = false, mensaje = "El ID proporcionado no coincide con el producto." });
+        }
 
         var existing = _service.GetById(id);
         if (existing == null)
-            return NotFound();
+        {
+            return NotFound(new { exito = false, mensaje = "Producto no encontrado." });
+        }
 
         _service.Update(p);
-        return NoContent();
+        return Ok(new { exito = true, mensaje = "Producto actualizado correctamente." });
     }
 
-    [HttpDelete("{id}")]
-    public IActionResult Delete(int id)
+    [HttpDelete("DeleteProduct/{id}")]
+    public IActionResult DeleteProduct(int id)
     {
         var existing = _service.GetById(id);
         if (existing == null)
-            return NotFound();
+        {
+            return NotFound(new { exito = false, mensaje = "Producto no encontrado." });
+        }
 
         _service.Delete(id);
-        return NoContent();
+        return Ok(new { exito = true, mensaje = "Producto eliminado correctamente." });
     }
 }
